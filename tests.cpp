@@ -3,23 +3,15 @@
 #define BOOST_TEST_MODULE allocator_test_module
 
 //#ifdef _MSC_VER
-//#define __PRETTY_FUNCTION__ __FUNCSIG__
+//	#define _ITERATOR_DEBUG_LEVEL 2
 //#endif
-//
-//#ifdef _MSC_VER
-//#define _ITERATOR_DEBUG_LEVEL 0
-//#endif
-
-#ifdef _MSC_VER
-	#define _ITERATOR_DEBUG_LEVEL 2
-#endif
 
 #include <functional>
 #include <boost/test/unit_test.hpp>
 #include <ctime>
 #include <map>
 
-//#include "reserv_allocator.h"
+#include "reserv_allocator.h"
 #include "helpers.h"
 #include "direct_collector.h"
 
@@ -40,42 +32,42 @@ bool call_test(string name, std::function<bool(void)> fntest) {
 	return res;
 }
 
-//bool test_reserv_allocator() {
-//	cout << "------------------------------\n";
-//	cout << __PRETTY_FUNCTION__ << endl;
-//	struct big {
-//		int i;
-//		int ar[10000];
-//		big(int i) : i(i) {}
-//	};
-//	/*const int count = 5;*/
-//	const int count = 10000;
-//	call_test("Test with std::map<int, big> map_std_alloc:", [&count]() {
-//		std::map<int, big> map_std_alloc;
-//		for (int i = 0; i < count; i++) {
-//			map_std_alloc.emplace(std::piecewise_construct,
-//				std::forward_as_tuple(i),
-//				std::forward_as_tuple(1));
-//		}
-//		return true;
-//		});
-//	/*using alloc = reserv_allocator<big, 5>;*/
-//	using alloc = reserv_allocator<big, 1000>;
-//	cout << "\nalloc = reserv_allocator<big, 1000>";
-//	call_test("test with std::map<int, big, std::less<int>, alloc> map_custom_alloc:", [&count]() {
-//		
-//		// speed x5 !!!
-//		std::map<int, big, std::less<int>, alloc> map_custom_alloc; 
-//		for (int i = 0; i < count; i++) {
-//			map_custom_alloc.emplace(std::piecewise_construct,
-//				std::forward_as_tuple(i),
-//				std::forward_as_tuple(1));
-//		}
-//		return true;
-//		});	
-//	cout << "------------------------------\n";
-//	return true;
-//}
+bool test_reserv_allocator() {
+	cout << "------------------------------\n";
+	cout << __PRETTY_FUNCTION__ << endl;
+	struct big {
+		int i;
+		int ar[10000];
+		big(int i) : i(i) {}
+	};
+	/*const int count = 5;*/
+	const int count = 10000;
+	call_test("Test with std::map<int, big> map_std_alloc:", [&count]() {
+		std::map<int, big> map_std_alloc;
+		for (int i = 0; i < count; i++) {
+			map_std_alloc.emplace(std::piecewise_construct,
+				std::forward_as_tuple(i),
+				std::forward_as_tuple(1));
+		}
+		return true;
+		});
+	/*using alloc = reserv_allocator<big, 5>;*/
+	using alloc = reserv_allocator<big, 1000>;
+	cout << "\nalloc = reserv_allocator<big, 1000>";
+	call_test("test with std::map<int, big, std::less<int>, alloc> map_custom_alloc:", [&count]() {
+		
+		// speed x5 !!!
+		std::map<int, big, std::less<int>, alloc> map_custom_alloc; 
+		for (int i = 0; i < count; i++) {
+			map_custom_alloc.emplace(std::piecewise_construct,
+				std::forward_as_tuple(i),
+				std::forward_as_tuple(1));
+		}
+		return true;
+		});	
+	cout << "------------------------------\n";
+	return true;
+}
 
 bool test_direct_collector() {
 	return call_test(__PRETTY_FUNCTION__, []() {
@@ -125,7 +117,7 @@ BOOST_AUTO_TEST_SUITE(allocator_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_of_test_system)
 {
-	/*BOOST_CHECK(test_reserv_allocator());*/
+	BOOST_CHECK(test_reserv_allocator());
 	BOOST_CHECK(test_direct_collector());
 }
 
