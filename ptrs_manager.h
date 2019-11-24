@@ -2,7 +2,7 @@
 
 template<typename T>
 struct ptrs_manager {
-	int ptrs_count;
+	long long ptrs_count;
 	struct ptrs_block {
 		/*T* ptrs[ptrs_count];*/
 		T** ptrs;
@@ -17,7 +17,7 @@ struct ptrs_manager {
 	// Current block, idx
 	cur_ptr_spec cur_spec;
 
-	ptrs_manager(int ptrs_count) : ptrs_count{ ptrs_count } {
+	ptrs_manager(long long ptrs_count) : ptrs_count{ ptrs_count } {
 		init_block();
 	}
 	~ptrs_manager() {
