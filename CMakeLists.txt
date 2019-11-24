@@ -39,3 +39,33 @@ set_target_properties(tests PROPERTIES
 	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
 	LINK_DIRECTORIES ${Boost_LIBRARY_DIRS} 
 )
+
+IF(WIN32)
+set_target_properties(range ip_filter_lib tests PROPERTIES
+  #COMPILE_OPTIONS "-Wall" # A lot of messages (in std libraries)
+)
+ELSE()
+set_target_properties(range ip_filter_lib PROPERTIES
+	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+)
+ENDIF()
+
+### Tests ###
+enable_testing()
+add_test(allocator_tests tests)
+###
+
+### Packaging ###
+install(TARGETS allocator RUNTIME DESTINATION bin)
+install(TARGETS tests RUNTIME DESTINATION lib/allocator/tests)
+
+set(CPACK_GENERATOR DEB)
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+
+set(CPACK_PACKAGE_CONTACT linkfly@yandex.ru)
+
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+include(CPack)
