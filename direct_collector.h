@@ -36,10 +36,10 @@ public:
 			this->operator++();
 			return it_new;
 		}
-		bool operator==(iterator& other) {
+		bool operator==(iterator other) {
 			return this->cur_ptr == other.cur_ptr;
 		}
-		bool operator!=(iterator& other) {
+		bool operator!=(iterator other) {
 			return this->cur_ptr != other.cur_ptr;
 		}
 
@@ -57,10 +57,10 @@ public:
 
 	size_t length = 0;
 
-	iterator begin() {
+	auto begin() {
 		return iterator::begin(this);
 	}
-	iterator end() {
+	auto end() {
 		return iterator::end(this);
 	}
 

@@ -102,7 +102,7 @@ _Ty* reserv_allocator<_Ty, count>::allocate(size_t n) {
 		loginfo("=== not malloc ===\n");
 	}
 	allocate_count -= n;
-	void* p = (std::byte*)ptr_alloc + sizeof(ptr_alloc) + allocate_count * sizeof(_Ty);
+	void* p = (char*)ptr_alloc + sizeof(ptr_alloc) + allocate_count * sizeof(_Ty);
 	return reinterpret_cast<_Ty*>(p);
 }
 
