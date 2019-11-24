@@ -12,7 +12,6 @@
 #include <map>
 
 #include "reserv_allocator.h"
-#include "helpers.h"
 #include "direct_collector.h"
 
 using std::string;
@@ -55,16 +54,16 @@ bool test_reserv_allocator() {
 	using alloc = reserv_allocator<big, 1000>;
 	cout << "\nalloc = reserv_allocator<big, 1000>";
 	call_test("test with std::map<int, big, std::less<int>, alloc> map_custom_alloc:", [&count]() {
-		
+
 		// speed x5 !!!
-		std::map<int, big, std::less<int>, alloc> map_custom_alloc; 
+		std::map<int, big, std::less<int>, alloc> map_custom_alloc;
 		for (int i = 0; i < count; i++) {
 			map_custom_alloc.emplace(std::piecewise_construct,
 				std::forward_as_tuple(i),
 				std::forward_as_tuple(1));
 		}
 		return true;
-		});	
+		});
 	cout << "------------------------------\n";
 	return true;
 }

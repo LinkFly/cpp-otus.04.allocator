@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "reserv_allocator.h"
-//#include "helpers.h"
 #include "direct_collector.h"
 
 using std::cout;
@@ -89,7 +88,7 @@ int main() {
 
 	/* создание экземпляра своего контейнера для хранения hard */
 	direct_collector<hard> dcollector;
-	
+
 	/* заполнение 10 значениями аналогичными первому контейнеру */
 	auto fn_collector_fill = [&fn_fact, &fn_fib](auto& collector) {
 		collector.emplace(1, 0);
