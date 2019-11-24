@@ -8,13 +8,12 @@ set(SOURCES
 set(HEADERS
 	share.h
 	reserv_allocator.h
-	helpers.h
 	logger.h
 	ptrs_manager.h
 	direct_collector.h
 	)
 set(DATA_FILES
-	
+
 
 	)
 
@@ -37,7 +36,7 @@ target_link_libraries(tests
 set_target_properties(tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
 	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
-	LINK_DIRECTORIES ${Boost_LIBRARY_DIRS} 
+	LINK_DIRECTORIES ${Boost_LIBRARY_DIRS}
 )
 
 IF(WIN32)
