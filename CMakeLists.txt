@@ -41,11 +41,11 @@ set_target_properties(tests PROPERTIES
 )
 
 IF(WIN32)
-set_target_properties(range ip_filter_lib tests PROPERTIES
+set_target_properties(allocator tests PROPERTIES
   #COMPILE_OPTIONS "-Wall" # A lot of messages (in std libraries)
 )
 ELSE()
-set_target_properties(range ip_filter_lib PROPERTIES
+set_target_properties(allocator tests PROPERTIES
 	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 ENDIF()
