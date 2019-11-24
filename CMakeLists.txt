@@ -43,10 +43,11 @@ set_target_properties(tests PROPERTIES
 IF(WIN32)
 set_target_properties(allocator tests PROPERTIES
   #COMPILE_OPTIONS "-Wall" # A lot of messages (in std libraries)
+  COMPILE_OPTIONS ""
 )
 ELSE()
 set_target_properties(allocator tests PROPERTIES
-	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-Wno-c++17-extensions"
 )
 ENDIF()
 

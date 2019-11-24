@@ -14,8 +14,12 @@ using std::endl;
 //#define LOG_ON 1
 
 struct Logger {
-	Logger(ostream& out, std::string prefix = "", std::string suffix = "", std::string ending = "") :
-		_out{ out }, _prefix(prefix), _suffix(suffix), _ending(ending) {}
+	Logger([[maybe_unused]] ostream& out = std::cout , std::string prefix = "", std::string suffix = "", std::string ending = "") :
+		_prefix(prefix), _suffix(suffix), _ending(ending) {
+#ifdef LOG_ON
+		_out = out;
+#endif
+	}
 	template<typename Arg, typename ...Args>
 	void operator()(Arg arg, Args&&... args) {
 #ifdef LOG_ON
@@ -36,7 +40,9 @@ struct Logger {
 #endif
 	}
 private:
+#ifdef LOG_ON
 	ostream& _out;
+#endif
 	std::string _prefix;
 	std::string _suffix;
 	std::string _ending;

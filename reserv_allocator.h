@@ -11,7 +11,7 @@
 
 template<typename _Ty, size_t count = 5>
 struct reserv_allocator {
-	static_assert(count > 0);
+	static_assert(count > 0, "count must be greater zero");
 	using value_type = _Ty;
 
 	//using size_type = std::size_t;
@@ -84,7 +84,7 @@ void reserv_allocator<_Ty, count>::dealloc() {
 	while (ptr_alloc != nullptr) {
 		loginfo("=== dealloc() ptr + ", count, " ===\n");
 		void* before_ptr_alloc = *(reinterpret_cast<void**>(ptr_alloc));
-		delete ptr_alloc;
+		free(ptr_alloc);
 		ptr_alloc = before_ptr_alloc;
 	}
 }
