@@ -9,6 +9,7 @@ const size_t ptrs_count_default = 10;
 template<typename T, class Alloc = std::allocator<T>>
 class direct_collector {
 public:
+	using alloc_type = Alloc;
 	class iterator {
 		typename ptrs_manager<T>::cur_ptr_spec cur_spec;
 		ptrs_manager<T>* pptrs_mng;
@@ -66,9 +67,9 @@ public:
 
 	template<typename ...Args>
 	void emplace(Args&&... args) {
-		T* ptr = allocator.allocate(1);
+		T* ptr = allocator->allocate(1);
 		pptrs_mng->add_ptr(ptr);
-		allocator.construct(ptr, std::forward<Args>(args)...);
+		allocator->construct(ptr, std::forward<Args>(args)...);
 		++length;
 	}
 
@@ -76,17 +77,24 @@ public:
 
 	direct_collector(size_t ptrs_count = ptrs_count_default) {
 		pptrs_mng = new ptrs_manager<T>(ptrs_count);
+		allocator = new Alloc();
 	}
 
 	~direct_collector() {
 		for (auto it = begin(); it != end(); ++it) {
-			allocator.destroy(it.cur_ptr);
-			allocator.deallocate(it.cur_ptr, 1);
+			allocator->destroy(it.cur_ptr);
+			allocator->deallocate(it.cur_ptr, 1);
 		}
 		delete pptrs_mng;
+		delete allocator;
+	}
+
+	direct_collector(const direct_collector<Alloc>& collector) {
+		this->allocator = collector.allocator;
+		this->pptrs_mng = new ptrs_manager<T>(*collector.pptrs_mng);
 	}
 
 private:
 	ptrs_manager<T>* pptrs_mng;
-	Alloc allocator;
+	Alloc* allocator;
 };

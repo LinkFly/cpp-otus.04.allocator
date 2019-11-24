@@ -25,6 +25,11 @@ struct reserv_allocator {
 	~reserv_allocator() noexcept;
 
 	/*constexpr reserv_allocator(const reserv_allocator&) noexcept = default;*/
+	//reserv_allocator(const reserv_allocator& source) noexcept {
+	//	this->allocate_count = source.allocate_count;
+	//	// TODO!!! copy memory into ptr_alloc;
+	//}
+
 	//template <class _Other, size_t count>
 	//constexpr reserv_allocator(const reserv_allocator<_Other, count>& cur_alloc) noexcept {}
 
