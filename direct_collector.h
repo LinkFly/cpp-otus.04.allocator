@@ -65,10 +65,10 @@ public:
 	}
 
 	template<typename ...Args>
-	void emplace(Args... args) {
+	void emplace(Args&&... args) {
 		T* ptr = allocator.allocate(1);
 		pptrs_mng->add_ptr(ptr);
-		allocator.construct(ptr, args...);
+		allocator.construct(ptr, std::forward<Args>(args)...);
 		++length;
 	}
 

@@ -1,10 +1,5 @@
 #pragma once
 
-#include <iostream>
-// TODO check necessary
-#include <sstream>  //include this to use string streams
-#include <string> 
-
 #include "logger.h"
 
 //#define ASSERT_ALLOC 1
@@ -51,10 +46,6 @@ private:
 	void alloc();
 	void dealloc();
 };
-
-//using std::cout;
-//using std::map;
-//using namespace std;
 
 template<typename _Ty, size_t count>
 reserv_allocator<_Ty, count>::reserv_allocator() noexcept {
@@ -108,8 +99,6 @@ _Ty* reserv_allocator<_Ty, count>::allocate(size_t n) {
 
 template<typename _Ty, size_t count>
 void reserv_allocator<_Ty, count>::deallocate(_Ty* p, [[maybe_unused]] size_t n) {
-	/*if (LOG_ON) cout << __PRETTY_FUNCTION__ << " [deallocate n = " << n << "]" << "\n\n";
-	free(p);*/
 	loginfo(" [deallocate n = 0 (disabled)]\n");
 }
 
