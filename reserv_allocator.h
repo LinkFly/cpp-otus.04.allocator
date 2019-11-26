@@ -57,7 +57,7 @@ reserv_allocator<_Ty, count>::~reserv_allocator() noexcept {
 
 template<typename _Ty, size_t count>
 _Ty* reserv_allocator<_Ty, count>::allocate(size_t n) {
-	return bmanager.get_ptr(n);
+	return bmanager.alloc_from_block(n);
 }
 
 template<typename _Ty, size_t count>

@@ -2,7 +2,10 @@
 
 
 // TODO Add to build parameters
-//#define ASSERT_ALLOC 1
+#define ASSERT_ALLOC 1
+#ifdef ASSERT_ALLOC
+#include <assert.h>
+#endif
 
 template<typename _Ty, size_t count>
 struct block_manager {
@@ -25,7 +28,7 @@ struct block_manager {
 			ptr_alloc = before_ptr_alloc;
 		}
 	}
-	_Ty* get_ptr(size_t n) {
+	_Ty* alloc_from_block(size_t n) {
 #ifdef ASSERT_ALLOC
 		assert(n <= count && (allocate_count == 0 || (n <= allocate_count)));
 #endif
