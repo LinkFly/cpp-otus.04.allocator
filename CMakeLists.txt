@@ -7,6 +7,7 @@ set(SOURCES
 	)
 set(HEADERS
 	share.h
+	block_manager.h
 	reserv_allocator.h
 	logger.h
 	ptrs_manager.h
