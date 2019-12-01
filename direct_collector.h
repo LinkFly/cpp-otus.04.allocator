@@ -83,7 +83,7 @@ struct direct_collector {
 	}
 
 	size_t size() { return length; }
-	direct_collector(size_t ptrs_count = ptrs_count_default) {
+	direct_collector(long long ptrs_count = ptrs_count_default) {
 		pptrs_mng = new ptrs_manager<T>(ptrs_count);
 		allocator = new Alloc();
 	}
@@ -94,7 +94,7 @@ struct direct_collector {
 
 	template<class U>
 	void copy_all_in(U* new_owner) {
-		pptrs_mng->copy_all_in<U>(new_owner);
+		pptrs_mng->template copy_all_in<U>(new_owner);
 	}
 
 	~direct_collector() {
