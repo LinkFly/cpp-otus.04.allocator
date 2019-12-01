@@ -10,6 +10,7 @@
 #include <boost/test/unit_test.hpp>
 #include <ctime>
 #include <map>
+#include <numeric>
 
 #include "reserv_allocator.h"
 #include "direct_collector.h"
@@ -103,6 +104,81 @@ bool test_direct_collector() {
 	});
 }
 
+//// Checking helpers
+template<class Collector>
+bool cont_checker(Collector& collector, int wait_size, int wait_sum) {
+	int all = std::accumulate(collector.begin(), collector.end(), 0);
+	return collector.size() == wait_size && all == wait_sum;
+}
+
+template<class Collector1, class Collector2>
+bool cont_checker(Collector1& collector1, Collector2& collector2, int wait_size1, int wait_size2, int sum1, int sum2) {
+	int all1 = std::accumulate(collector1.begin(), collector1.end(), 0);
+	int all2 = std::accumulate(collector2.begin(), collector2.end(), 0);
+	return (collector1.size() == wait_size1) && (collector2.size() == wait_size2) && all1 == sum1 && all2 == sum2;
+}
+//// end Checking helpers
+
+bool test_direct_collector_simple_copy() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		direct_collector<int> my;
+		my.emplace(1);
+		my.emplace(2);
+		my.emplace(3);
+
+		// Copy
+		direct_collector<int> my2(my);
+		my2.emplace(4);
+
+		// Check not changed old container
+		return cont_checker(my, my2, 3, 4, 6, 10);
+		});
+}
+
+bool test_direct_collector_simple_move() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		auto tmp = direct_collector<int>{};
+		tmp.emplace(1);
+		tmp.emplace(2);
+		// Move
+		direct_collector<int> my(std::move(tmp));
+		// Change new
+		my.emplace(3);
+		// Check correct new
+		return cont_checker(my, 3, 6);
+	});
+}
+
+bool test_direct_collector_copy_other() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		direct_collector<int, reserv_allocator<int>> my;
+		my.emplace(1);
+		my.emplace(2);
+		my.emplace(3);
+
+		// Copy
+		direct_collector<int> my2(my);
+		my2.emplace(4);
+
+		// Check not changed old container
+		return cont_checker(my, my2, 3, 4, 6, 10);
+		});
+}
+
+bool test_direct_collector_move_other() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		auto tmp = direct_collector<int, reserv_allocator<int>>{};
+		tmp.emplace(1);
+		tmp.emplace(2);
+		// Move
+		direct_collector<int> my(std::move(tmp));
+		// Change new
+		my.emplace(3);
+		// Check correct new
+		return cont_checker(my, 3, 6);
+		});
+}
+
 //struct Init {
 //	Init(std::function<void()> init_func) {
 //		init_func();
@@ -118,6 +194,10 @@ BOOST_AUTO_TEST_CASE(test_of_test_system)
 {
 	BOOST_CHECK(test_reserv_allocator());
 	BOOST_CHECK(test_direct_collector());
+	BOOST_CHECK(test_direct_collector_simple_copy());
+	BOOST_CHECK(test_direct_collector_simple_move());
+	BOOST_CHECK(test_direct_collector_copy_other());
+	BOOST_CHECK(test_direct_collector_move_other());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

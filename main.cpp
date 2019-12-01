@@ -9,10 +9,6 @@
 
 using std::cout;
 
-void try_my_container() {
-
-}
-
 int main() {
 	struct hard {
 		int fa;
@@ -116,6 +112,83 @@ int main() {
 	fn_print_collector(dcollector);*/
 	cout << "=== direct_collector (with reserv_allocator): ===\n";
 	fn_print_collector(dcollector2);
+
+	//////////////////////////////////////////////
+	cout << "\n\n=============== Copy & Move constructors with same & other allocators (tests see in tests.cpp )=================\n";
+	{
+		// Checking helper
+		auto fn = [](auto& mes, auto& collector) {
+			int all = 0;
+			for (auto& i : collector) {
+				all += i;
+			}
+			bool res = all == 3;
+			auto s_res = res ? "true" : "false";
+			cout << mes << s_res << endl;
+			assert(res);
+		};
+
+		{
+			///////////// Copy ////////////////
+			cout << "\nCopy from collector with same allocator: \n";
+			direct_collector<int> tmp;
+			tmp.emplace(1);
+			tmp.emplace(2);
+
+			direct_collector<int> collector(tmp);
+			fn("Checking simple copy: ", collector);
+		}
+
+		{
+			///////////// Move ////////////////
+			cout << "\nMove from collector with same allocator: \n";
+			// don't working - compiler optimized it (msvc)
+			/*direct_collector<int> my3{};*/
+
+			// this also optimized:
+			/*auto fn_get_tmp_collector = []() -> direct_collector<int> { cout << "asdf" << endl; return direct_collector<int>{}; };
+			direct_collector<int> my3(fn_get_tmp_collector());*/
+
+			direct_collector<int> collector(std::move(direct_collector<int>{}));
+			collector.emplace(1);
+			collector.emplace(2);
+			fn("Checking simple move: ", collector);
+		}
+
+		{
+			///////////// Copy with other ////////////////
+			auto tmp = direct_collector<int, reserv_allocator<int>>{};
+			cout << "\nCopy from collector with other allocator: \n";
+			direct_collector<int> collector(tmp);
+			collector.emplace(1);
+			collector.emplace(2);
+			fn("Checking copy other: ", collector);
+		}
+
+		{
+			///////////// Move with other ////////////////
+			cout << "\nMove from collector with other allocator: \n";
+			direct_collector<int> collector(direct_collector<int, reserv_allocator<int>>{});
+			collector.emplace(1);
+			collector.emplace(2);
+			fn("Checking move other: ", collector);
+		}
+
+		{
+			// Check correct new
+			cout << "\n-----------------------------";
+			cout << "\nMove from collector with other allocator (exp N2): \n";
+
+			auto tmp = direct_collector<int, reserv_allocator<int>>{};
+			tmp.emplace(1);
+			// Move
+			direct_collector<int> collector(std::move(tmp));
+			// Change new
+			collector.emplace(2);
+			fn("Checking move other(2): ", collector);
+			cout << "-----------------------------\n\n";
+		}
+	}
 
 	return 0;
 }

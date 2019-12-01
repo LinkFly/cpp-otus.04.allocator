@@ -7,17 +7,24 @@
 const size_t ptrs_count_default = 10;
 
 template<typename T, class Alloc = std::allocator<T>>
-class direct_collector {
-public:
-	using alloc_type = Alloc;
+struct direct_collector {
+	class iterator;
+	size_t length = 0;
+	ptrs_manager<T>* pptrs_mng;
+	Alloc* allocator;
+	std::function<void(class iterator&)> fnDeallocByOldAlloc = nullptr;
 	class iterator {
 		typename ptrs_manager<T>::cur_ptr_spec cur_spec;
 		ptrs_manager<T>* pptrs_mng;
 		T* cur_ptr;
-		friend class direct_collector;
+		friend struct direct_collector;
 	public:
 		iterator(direct_collector* parent) {
 			pptrs_mng = parent->pptrs_mng;
+			if (!pptrs_mng) {
+				cur_ptr = nullptr;
+				return;
+			}
 			cur_spec = pptrs_mng->init_ptr_spec();
 			this->operator++();
 		}
@@ -56,8 +63,6 @@ public:
 		//// end For using in parent
 	};
 
-	size_t length = 0;
-
 	auto begin() {
 		return iterator::begin(this);
 	}
@@ -73,15 +78,31 @@ public:
 		++length;
 	}
 
-	size_t size() { return length; }
+	void copy(const T& t) {
+		emplace(t);
+	}
 
+	size_t size() { return length; }
 	direct_collector(size_t ptrs_count = ptrs_count_default) {
 		pptrs_mng = new ptrs_manager<T>(ptrs_count);
 		allocator = new Alloc();
 	}
 
+	auto get_ptrs_count() {
+		return pptrs_mng->ptrs_count;
+	}
+
+	template<class U>
+	void copy_all_in(U* new_owner) {
+		pptrs_mng->copy_all_in<U>(new_owner);
+	}
+
 	~direct_collector() {
-		for (auto it = begin(); it != end(); ++it) {
+		auto it = begin();
+		if (fnDeallocByOldAlloc != nullptr) {
+			fnDeallocByOldAlloc(it);
+		}
+		for (;it != end(); ++it) {
 			allocator->destroy(it.cur_ptr);
 			allocator->deallocate(it.cur_ptr, 1);
 		}
@@ -89,12 +110,41 @@ public:
 		delete allocator;
 	}
 
-	direct_collector(const direct_collector<Alloc>& collector) {
-		this->allocator = collector.allocator;
-		this->pptrs_mng = new ptrs_manager<T>(*collector.pptrs_mng);
+	direct_collector(direct_collector<T, Alloc>& collector) : direct_collector<T, Alloc>{ collector.get_ptrs_count() } {
+		collector.copy_all_in(this);
 	}
 
-private:
-	ptrs_manager<T>* pptrs_mng;
-	Alloc* allocator;
+	direct_collector(direct_collector<T, Alloc> && collector) noexcept {
+		this->pptrs_mng = collector.pptrs_mng;
+		this->allocator = collector.allocator;
+		this->length = collector.length;
+		collector.pptrs_mng = nullptr;
+		collector.allocator = nullptr;
+	}
+
+	// Using same algorithm - no problem copying elements from collector with other allocator
+	template<class OtherAlloc>
+	direct_collector(direct_collector<T, OtherAlloc>& collector) : direct_collector<T, Alloc>{ collector.get_ptrs_count() } {
+		collector.copy_all_in(this);
+	}
+
+	template<class OtherAlloc>
+	direct_collector(direct_collector<T, OtherAlloc>&& collector) {
+		this->allocator = new Alloc();
+		this->pptrs_mng = collector.pptrs_mng;
+		size_t eltCount = this->length = collector.length;
+		auto moved_alloc = collector.allocator;
+
+		fnDeallocByOldAlloc = [this, moved_alloc, eltCount](auto& it) {
+			size_t i = 0;
+			for (; it != this->end(); ++it) {
+				if (++i > eltCount) break;
+				moved_alloc->destroy(it.cur_ptr);
+				moved_alloc->deallocate(it.cur_ptr, 1);
+			}
+		};
+
+		collector.pptrs_mng = nullptr;
+		collector.allocator = nullptr;
+	}
 };

@@ -1,10 +1,11 @@
 #pragma once
 
+#include <functional>
+
 template<typename T>
 struct ptrs_manager {
 	long long ptrs_count;
 	struct ptrs_block {
-		/*T* ptrs[ptrs_count];*/
 		T** ptrs;
 		ptrs_block* next;
 	};
@@ -22,6 +23,15 @@ struct ptrs_manager {
 	}
 	~ptrs_manager() {
 		delete_all_blocks();
+	}
+
+	template<class U>
+	void copy_all_in(U* new_owner) {
+		cur_ptr_spec cur_spec = this->init_ptr_spec();
+		while (bool next_res = this->next_ptr_spec(cur_spec)) {
+			T* cur_ptr = this->get_ptr(cur_spec);
+			new_owner->copy(*cur_ptr);
+		}
 	}
 
 	auto alloc_block() {
