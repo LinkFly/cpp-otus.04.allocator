@@ -21,7 +21,7 @@ struct Logger {
 #endif
 	}
 	template<typename Arg, typename ...Args>
-	void operator()(Arg arg, Args&&... args) {
+	void operator()([[maybe_unused]] Arg arg, [[maybe_unused]] Args&&... args) {
 #ifdef LOG_ON
 		std::string cur_prefix;
 		if (_prefix != "") {

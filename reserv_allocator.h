@@ -61,7 +61,7 @@ _Ty* reserv_allocator<_Ty, count>::allocate(size_t n) {
 }
 
 template<typename _Ty, size_t count>
-void reserv_allocator<_Ty, count>::deallocate(_Ty* p, [[maybe_unused]] size_t n) {
+void reserv_allocator<_Ty, count>::deallocate([[maybe_unused]] _Ty* p, [[maybe_unused]] size_t n) {
 	loginfo(" [deallocate n = 0 (disabled)]\n");
 }
 
