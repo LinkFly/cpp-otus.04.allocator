@@ -42,7 +42,7 @@ bool test_reserv_allocator() {
 	};
 	/*const int count = 5;*/
 	const int count = 10000;
-	call_test("Test with std::map<int, big> map_std_alloc:", [count]() {
+	call_test("Test with std::map<int, big> map_std_alloc:", []() {
 		std::map<int, big> map_std_alloc;
 		for (int i = 0; i < count; i++) {
 			map_std_alloc.emplace(std::piecewise_construct,
@@ -54,7 +54,7 @@ bool test_reserv_allocator() {
 	/*using alloc = reserv_allocator<big, 5>;*/
 	using alloc = reserv_allocator<big, 1000>;
 	cout << "\nalloc = reserv_allocator<big, 1000>";
-	call_test("test with std::map<int, big, std::less<int>, alloc> map_custom_alloc:", [count]() {
+	call_test("test with std::map<int, big, std::less<int>, alloc> map_custom_alloc:", []() {
 
 		// speed x5 !!!
 		std::map<int, big, std::less<int>, alloc> map_custom_alloc;
@@ -106,13 +106,13 @@ bool test_direct_collector() {
 
 //// Checking helpers
 template<class Collector>
-bool cont_checker(Collector& collector, long long wait_size, int wait_sum) {
+bool cont_checker(Collector& collector, unsigned long wait_size, int wait_sum) {
 	int all = std::accumulate(collector.begin(), collector.end(), 0);
 	return collector.size() == wait_size && all == wait_sum;
 }
 
 template<class Collector1, class Collector2>
-bool cont_checker(Collector1& collector1, Collector2& collector2, long long wait_size1, long long wait_size2, int sum1, int sum2) {
+bool cont_checker(Collector1& collector1, Collector2& collector2, unsigned long wait_size1, unsigned long wait_size2, int sum1, int sum2) {
 	int all1 = std::accumulate(collector1.begin(), collector1.end(), 0);
 	int all2 = std::accumulate(collector2.begin(), collector2.end(), 0);
 	return (collector1.size() == wait_size1) && (collector2.size() == wait_size2) && all1 == sum1 && all2 == sum2;
