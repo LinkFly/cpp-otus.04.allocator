@@ -88,12 +88,12 @@ struct direct_collector {
 		allocator = new Alloc();
 	}
 
-	auto get_ptrs_count() {
+	auto get_ptrs_count() const {
 		return pptrs_mng->ptrs_count;
 	}
 
 	template<class U>
-	void copy_all_in(U* new_owner) {
+	void copy_all_in(U* new_owner) const {
 		pptrs_mng->template copy_all_in<U>(new_owner);
 	}
 
@@ -110,28 +110,28 @@ struct direct_collector {
 		delete allocator;
 	}
 
-	direct_collector(direct_collector<T, Alloc>& collector) : direct_collector<T, Alloc>{ collector.get_ptrs_count() } {
+	direct_collector(const direct_collector<T, Alloc>& collector) : direct_collector<T, Alloc>{ collector.get_ptrs_count() } {
 		collector.copy_all_in(this);
 	}
 
 	direct_collector(direct_collector<T, Alloc> && collector) noexcept {
-		this->pptrs_mng = collector.pptrs_mng;
-		this->allocator = collector.allocator;
-		this->length = collector.length;
+		pptrs_mng = collector.pptrs_mng;
+		allocator = collector.allocator;
+		length = collector.length;
 		collector.pptrs_mng = nullptr;
 		collector.allocator = nullptr;
 	}
 
 	// Using same algorithm - no problem copying elements from collector with other allocator
 	template<class OtherAlloc>
-	direct_collector(direct_collector<T, OtherAlloc>& collector) : direct_collector<T, Alloc>{ collector.get_ptrs_count() } {
+	direct_collector(const direct_collector<T, OtherAlloc>& collector) : direct_collector<T, Alloc>{ collector.get_ptrs_count() } {
 		collector.copy_all_in(this);
 	}
 
 	template<class OtherAlloc>
 	direct_collector(direct_collector<T, OtherAlloc>&& collector) {
-		this->allocator = new Alloc();
-		this->pptrs_mng = collector.pptrs_mng;
+		allocator = new Alloc();
+		pptrs_mng = collector.pptrs_mng;
 		size_t eltCount = this->length = collector.length;
 		auto moved_alloc = collector.allocator;
 
@@ -142,6 +142,7 @@ struct direct_collector {
 				moved_alloc->destroy(it.cur_ptr);
 				moved_alloc->deallocate(it.cur_ptr, 1);
 			}
+			delete moved_alloc;
 		};
 
 		collector.pptrs_mng = nullptr;

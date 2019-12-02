@@ -149,10 +149,14 @@ int main() {
 			/*auto fn_get_tmp_collector = []() -> direct_collector<int> { cout << "asdf" << endl; return direct_collector<int>{}; };
 			direct_collector<int> my3(fn_get_tmp_collector());*/
 
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
+#endif
 			direct_collector<int> collector(std::move(direct_collector<int>{}));
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
 			collector.emplace(1);
 			collector.emplace(2);
 			fn("Checking simple move: ", collector);
