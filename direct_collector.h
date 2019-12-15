@@ -12,7 +12,7 @@ struct direct_collector {
 	size_t length = 0;
 	ptrs_manager<T>* pptrs_mng;
 	Alloc* allocator;
-	std::function<void(class iterator&)> fnDeallocByOldAlloc = nullptr;
+	/*std::function<void(class iterator&)> fnDeallocByOldAlloc = nullptr;*/
 	class iterator {
 		typename ptrs_manager<T>::cur_ptr_spec cur_spec;
 		ptrs_manager<T>* pptrs_mng;
@@ -99,9 +99,9 @@ struct direct_collector {
 
 	~direct_collector() {
 		auto it = begin();
-		if (fnDeallocByOldAlloc != nullptr) {
+		/*if (fnDeallocByOldAlloc != nullptr) {
 			fnDeallocByOldAlloc(it);
-		}
+		}*/
 		for (;it != end(); ++it) {
 			allocator->destroy(it.cur_ptr);
 			allocator->deallocate(it.cur_ptr, 1);
@@ -129,21 +129,25 @@ struct direct_collector {
 	}
 
 	template<class OtherAlloc>
-	direct_collector(direct_collector<T, OtherAlloc>&& collector) {
-		allocator = new Alloc();
+	direct_collector(direct_collector<T, OtherAlloc>&& collector) : direct_collector<T, Alloc>{ collector.get_ptrs_count() } {
+		/*allocator = new Alloc();
 		pptrs_mng = collector.pptrs_mng;
 		size_t eltCount = this->length = collector.length;
-		auto moved_alloc = collector.allocator;
+		auto moved_alloc = collector.allocator;*/
 
-		fnDeallocByOldAlloc = [this, moved_alloc, eltCount](auto& it) {
-			size_t i = 0;
-			for (; it != this->end(); ++it) {
-				if (++i > eltCount) break;
-				moved_alloc->destroy(it.cur_ptr);
-				moved_alloc->deallocate(it.cur_ptr, 1);
-			}
-			delete moved_alloc;
-		};
+		for (auto& elt : collector) {
+			this->emplace(elt);
+		}
+
+		//fnDeallocByOldAlloc = [this, moved_alloc, eltCount](auto& it) {
+		//	size_t i = 0;
+		//	for (; it != this->end(); ++it) {
+		//		if (++i > eltCount) break;
+		//		moved_alloc->destroy(it.cur_ptr);
+		//		moved_alloc->deallocate(it.cur_ptr, 1);
+		//	}
+		//	delete moved_alloc;
+		//};
 
 		collector.pptrs_mng = nullptr;
 		collector.allocator = nullptr;
