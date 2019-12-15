@@ -42,7 +42,7 @@ bool test_reserv_allocator() {
 	};
 	/*const int count = 5;*/
 	const int count = 10000;
-	call_test("Test with std::map<int, big> map_std_alloc:", []() {
+	call_test("Test with std::map<int, big> map_std_alloc:", [&]() {
 		std::map<int, big> map_std_alloc;
 		for (int i = 0; i < count; i++) {
 			map_std_alloc.emplace(std::piecewise_construct,
@@ -54,7 +54,7 @@ bool test_reserv_allocator() {
 	/*using alloc = reserv_allocator<big, 5>;*/
 	using alloc = reserv_allocator<big, 1000>;
 	cout << "\nalloc = reserv_allocator<big, 1000>";
-	call_test("test with std::map<int, big, std::less<int>, alloc> map_custom_alloc:", []() {
+	call_test("test with std::map<int, big, std::less<int>, alloc> map_custom_alloc:", [&]() {
 
 		// speed x5 !!!
 		std::map<int, big, std::less<int>, alloc> map_custom_alloc;

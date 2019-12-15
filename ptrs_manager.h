@@ -98,7 +98,7 @@ struct ptrs_manager {
 		auto cur = first_ptrs_block;
 		while (cur != nullptr) {
 			auto next = cur->next;
-			delete cur->ptrs;
+			delete[] cur->ptrs;
 			delete cur;
 			cur = next;
 		}
