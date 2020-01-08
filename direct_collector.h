@@ -136,7 +136,7 @@ struct direct_collector {
 		auto moved_alloc = collector.allocator;*/
 
 		for (auto& elt : collector) {
-			this->emplace(elt);
+			this->emplace(std::move(elt));
 		}
 
 		//fnDeallocByOldAlloc = [this, moved_alloc, eltCount](auto& it) {
